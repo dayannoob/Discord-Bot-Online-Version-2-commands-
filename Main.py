@@ -5,8 +5,8 @@ import os
 
 # دریافت توکن‌های بات از متغیرهای محیطی
 TOKENS = [
-    os.getenv("TOKEN_1"),  # بات 1 (مدیریت تیکت‌ها)
-    os.getenv("TOKEN_2")   # بات 2 (مدیریت دستورات)
+    os.getenv("MTM1NDQ0MjgzODMwNTI3NjAzNQ.GAOUqL.UIAUorjZYL7pi1fz1VW8Z8aIelBmPgGpKzhBVk"),  # بات 1 (مدیریت تیکت‌ها)
+    os.getenv("MTM1NDM3ODUzMTI1NzE5MjQ4OQ.G0MZdh.L1XyVARyXGrFGh4DW2gEnaCRLz8-DoPpeByygw")   # بات 2 (مدیریت دستورات)
 ]
 
 intents = discord.Intents.default()
