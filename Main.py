@@ -1,11 +1,12 @@
 import discord
 from discord.ext import commands
 import asyncio
+import os
 
-# توکن‌های دو بات
+# دریافت توکن‌های بات از متغیرهای محیطی
 TOKENS = [
-    "Your Bot Token",  # بات 1 (مدیریت تیکت‌ها)
-    "Your Bot Token"   # بات 2 (مدیریت دستورات)
+    os.getenv("TOKEN_1"),  # بات 1 (مدیریت تیکت‌ها)
+    os.getenv("TOKEN_2")   # بات 2 (مدیریت دستورات)
 ]
 
 intents = discord.Intents.default()
@@ -13,9 +14,7 @@ intents.message_content = True
 intents.guilds = True
 intents.members = True
 
-bots = []
-
-for index, token in enumerate(TOKENS):
+async def start_bot(index, token):
     bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 
     @bot.event
@@ -67,7 +66,7 @@ for index, token in enumerate(TOKENS):
             else:
                 await ctx.send("❌ این کانال تیکت نیست!", delete_after=5)
 
-    # 🔹 بات 2 - مدیریت دستورات و اطلاعات
+    # 🔹 بات 2 - مدیریت دستورات
     elif index == 1:
         @bot.command(name="help")
         async def custom_help(ctx):
@@ -85,7 +84,7 @@ for index, token in enumerate(TOKENS):
 
         @bot.command(name="send")
         async def send_message(ctx, *, message: str):
-            """بات هر متنی که بعد از !send باشد را ارسال می‌کند"""
+            """ارسال پیام توسط بات"""
             await ctx.message.delete()
             await ctx.send(message)
 
@@ -124,7 +123,8 @@ for index, token in enumerate(TOKENS):
                             "👨‍💻 **Developed By: Dayan**",
                 color=discord.Color.blue()
             )
-            embed.set_thumbnail(url=bot.user.avatar.url)
+            if bot.user.avatar:
+                embed.set_thumbnail(url=bot.user.avatar.url)
             await ctx.send(embed=embed)
 
         @bot.command(name="serverinfo")
@@ -139,12 +139,14 @@ for index, token in enumerate(TOKENS):
                             f"🔹 تاریخ ساخت: `{guild.created_at.strftime('%Y-%m-%d')}`",
                 color=discord.Color.green()
             )
-            embed.set_thumbnail(url=guild.icon.url if guild.icon else None)
+            if guild.icon:
+                embed.set_thumbnail(url=guild.icon.url)
             await ctx.send(embed=embed)
 
-    bots.append((bot, token))
+    await bot.start(token)
 
-async def run_bots():
-    await asyncio.gather(*(bot.start(token) for bot, token in bots))
+async def main():
+    tasks = [asyncio.create_task(start_bot(index, token)) for index, token in enumerate(TOKENS) if token]
+    await asyncio.gather(*tasks)
 
-asyncio.run(run_bots())
+asyncio.run(main())
